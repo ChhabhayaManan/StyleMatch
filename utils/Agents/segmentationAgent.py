@@ -38,7 +38,7 @@ class SegmentationAgent:
                 "boxes" : img_boxes,
                 "segmented_imgs" : cropped_imgs,
                 "img" : imgWithMask,
-                "error" : None
+                "errors" : None
                 }
         
 

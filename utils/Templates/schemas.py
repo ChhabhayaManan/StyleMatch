@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from PIL import Image
 
 class ProductInfo(BaseModel):
@@ -45,8 +45,8 @@ class ImageState(BaseModel):
     boxes : Optional[List[List[int]]] = Field(default_factory=list)
     products : Optional[List[ProductInfo]] = Field(default_factory=list)
     segmented_imgs : Optional[List[Image.Image]] = Field(default_factory=list)
-    error : Optional[str] = None
+    errors : Optional[List[str]] = None
 
-    class Config:
-        arbitrary_types_allowed = True
-
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True
+    )

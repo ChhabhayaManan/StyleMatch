@@ -1,6 +1,6 @@
 from typing import List
 from PIL import Image
-from schemas import ProductInfo
+from utils.Templates.schemas import ProductInfo
 from langchain_core.output_parsers import JsonOutputParser
 from google.genai import types
 
