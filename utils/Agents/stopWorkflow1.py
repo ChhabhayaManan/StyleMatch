@@ -2,7 +2,7 @@ from utils.Templates.schemas import ImageState
 
 
 class StopWorkflowAgent:
-    def execute(self, imageState: ImageState) -> dict:
+    def run(self, imageState: ImageState) -> dict:
         """Stops the workflow and displays the final confidence score"""
 
         if imageState.products is not None:

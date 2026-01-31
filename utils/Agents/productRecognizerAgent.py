@@ -18,9 +18,10 @@ class ProductRecognizerAgent:
     def __init__(self):
         self.gemini_client = GeminiClient
         
-    def recognize_product(self, ImageState: ImageState, nearest_items: dict) -> ImageState:
+    def run(self, ImageState: ImageState) -> ImageState:
         identified_products = []
         segmentated_imgs = ImageState.segmented_imgs
+        nearest_items = ImageState.nearest_items
 
         for idx, img in enumerate(segmentated_imgs):
             segment_nearest_items = nearest_items.get(f'segment_{idx}', [])

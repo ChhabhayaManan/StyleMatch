@@ -9,12 +9,9 @@ class SegmentationAgent:
     def __init__(self):
         pass
     
-    def segment_image(self, imageState: ImageState, prompt: str) -> dict:
+    def run(self, imageState: ImageState) -> dict:
         img = imageState.img
-
-        
-        
-        
+        prompt = imageState.prompt
         #converting the final img into Image.image formate if it's in np.ndarray
         if type(img) == np.ndarray:
             f_Img = Image.fromarray(img)

@@ -12,7 +12,7 @@ class InfoRetrievalAgent:
         with open(metadata_path, 'r') as f:
             self.metadata = json.load(f)
 
-    def retrieve_similar_items(self, imageState: ImageState, top_k: int = 5) -> dict:
+    def run(self, imageState: ImageState, top_k: int = 5) -> dict:
         segmented_imgs = imageState.segmented_imgs
 
         embeddings_segments = [clip_model.encode(img) for img in segmented_imgs]
@@ -31,6 +31,8 @@ class InfoRetrievalAgent:
                 })
             results[f'segment_{seg_idx}'] = seg_results
 
+
         return {
-            'results': results
+            **imageState,
+            "nearest_items": results
         }
