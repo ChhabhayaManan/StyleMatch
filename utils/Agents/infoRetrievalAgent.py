@@ -1,4 +1,4 @@
-from Project.StyleMatch.utils.Templates.schemas import ImageState
+from utils.Templates.schemas import ImageState
 import faiss
 import json
 from PIL import Image
@@ -12,14 +12,18 @@ class InfoRetrievalAgent:
         with open(metadata_path, 'r') as f:
             self.metadata = json.load(f)
 
-    def run(self, imageState: ImageState, top_k: int = 5) -> dict:
+    def run(self, imageState: ImageState, top_k: int = 2) -> dict:
         segmented_imgs = imageState.segmented_imgs
 
+        print("Performing embedding generation...")
         embeddings_segments = [clip_model.encode(img) for img in segmented_imgs]
         embeddings_segments = np.array(embeddings_segments).astype('float32')
 
+
+        print("Performing info retrieval...")
         dist_indices = [self.index.search(embedding[np.newaxis, :], top_k) for embedding in embeddings_segments]
 
+        print("Info retrieval completed.")
         results = {}
         for seg_idx, (distances, indices) in enumerate(dist_indices):
             seg_results = []
@@ -33,6 +37,6 @@ class InfoRetrievalAgent:
 
 
         return {
-            **imageState,
+            **imageState.model_dump(),
             "nearest_items": results
         }

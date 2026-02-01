@@ -1,9 +1,9 @@
 import torch
 import numpy as np
 from PIL import Image
-from Project.StyleMatch.utils.models.samLoader import Processor, model
-from Project.StyleMatch.utils.Templates.schemas import ImageState
-
+from utils.models.samLoader import model
+from utils.Templates.schemas import ImageState
+from sam3.model.sam3_image_processor import Sam3Processor
 
 class SegmentationAgent:
     def __init__(self):
@@ -18,24 +18,38 @@ class SegmentationAgent:
         else:
             f_Img = img
 
+        if f_Img.mode != "RGB": #if the dimentions of img are more than 3 convert to RGB
+            f_Img = f_Img.convert("RGB")
+        print("Performing segmentation...")
+        Processor = Sam3Processor(model, confidence_threshold=0.7)
+
         #inference states for processing the img
         inf_state = Processor.set_image(f_Img)
         inf_state1 = Processor.set_text_prompt(prompt=prompt ,state=inf_state)
 
-
+        print("Segmentation completed.")
         img_boxes = inf_state1['boxes']
-        if len(img_boxes) == 0:
-            return {**ImageState , "error" : ["No objects detected in the image"]}
+        boxes = (#because boxes are in tensor formate we need to convert them to list
+            img_boxes
+            .detach()
+            .cpu()
+            .round()
+            .int()
+            .tolist()
+        )
+        if len(boxes) == 0:
+            errors = imageState.errors
+            errors.append("No objects detected in the image")
+            return {**imageState.model_dump() , "errors" : errors}
 
-        imgWithMask = draw_boxes_on_image(f_Img, img_boxes)
-        cropped_imgs = getCroppedImgs(f_Img, img_boxes)
+        imgWithMask = draw_boxes_on_image(f_Img, boxes)
+        cropped_imgs = getCroppedImgs(f_Img, boxes)
         
-        
-        return {**imageState,
-                "boxes" : img_boxes,
+
+        return {**imageState.model_dump(),
+                "boxes" : boxes,
                 "segmented_imgs" : cropped_imgs,
-                "img" : imgWithMask,
-                "errors" : None
+                "img" : imgWithMask
                 }
         
 

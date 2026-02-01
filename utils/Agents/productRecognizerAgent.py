@@ -6,10 +6,11 @@
 #code the main file connecting our first workflow. and test it for some testcase.
 #see if it works fine.
 
+import json
 from utils.models.geminiModel import GeminiClient
 from utils.models.clipModel import clip_model
-from utils.template.schemas import ProductInfo, ImageState
-from utils.template.promptTemplate import prompt_template
+from utils.Templates.schemas import ProductInfo, ImageState
+from utils.Templates.promptTemplate import prompt_template
 from PIL import Image
 
 
@@ -23,23 +24,50 @@ class ProductRecognizerAgent:
         segmentated_imgs = ImageState.segmented_imgs
         nearest_items = ImageState.nearest_items
 
-        for idx, img in enumerate(segmentated_imgs):
-            segment_nearest_items = nearest_items.get(f'segment_{idx}', [])
-            prompt = prompt_template(segment_nearest_items, img)
-            response = self.gemini_client.model.generate_content(
-                model='gemini-3-flash-preview',
-                contents=prompt,
-                config={
-                    "response_mime_type": "application/json",
-                    "response_json_schema": ProductInfo.model_json_schema(),
-                }
-            )
-            productInfoTemp = ProductInfo.model_validate(response.candidates[0].content.parts[0].text)
-            identified_products.append(productInfoTemp)
         
+
+        print("Performing product recognition...")
+        for idx, img in enumerate(segmentated_imgs):
+            print(
+                f"[Gemini] starting segment {idx+1}/{len(segmentated_imgs)}",
+                flush=True
+            )
+            nearest_items_segment = nearest_items.get(f'segment_{idx}', [])
+            prompt = prompt_template(
+                nearest_items=nearest_items_segment,
+                img=img
+            )
+            try:
+                response = self.gemini_client.models.generate_content(
+                    model="models/gemini-3-flash-preview",
+                    contents=prompt,
+                    config={
+                        "response_mime_type": "application/json",
+                        "response_json_schema": ProductInfo.model_json_schema(),
+                    }
+                )
+            except Exception as e:
+                err = ImageState.errors
+                err.append(f"Gemini API error for segment {idx+1}: {str(e)}")
+                return {
+                    "errors": err,
+                    "products": identified_products
+                }
+                                                                        
+
+            print(
+                f"[Gemini] finished segment {idx+1}",
+                flush=True
+            )
+            raw_text = response.candidates[0].content.parts[0].text
+            data = json.loads(raw_text)
+            productInfoTemp = ProductInfo.model_validate(data)
+            identified_products.append(productInfoTemp)
+
+        print("Product recognition completed.")
         return {
-            **ImageState,
-            "identified_products": identified_products
+            "products": identified_products
         }
     
-    
+
+

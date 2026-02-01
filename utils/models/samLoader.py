@@ -1,7 +1,12 @@
 import torch
-from sam3.model_builder import build_sam3_image_model
-from sam3.model.sam3_image_processor import Sam3Processor
+from huggingface_hub import login
+import os
 
+login(token=os.environ["HUGGINGFACEHUB_API_TOKEN"])
+
+from sam3.model_builder import build_sam3_image_model
+
+model = None
 
 print("Sam3 is loading......")
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -9,7 +14,6 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 try:
     #building model
     model = build_sam3_image_model()
-    Processor = Sam3Processor(model, confidence_threshold=0.7)
     model.eval()
     model.to(device)
 

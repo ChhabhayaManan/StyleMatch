@@ -1,5 +1,5 @@
-from typing import List, Optional
-from pydantic import BaseModel, Field, ConfigDict, TypeDict
+from typing import List, Optional, Dict
+from pydantic import BaseModel, Field, ConfigDict
 from PIL import Image
 
 class ProductInfo(BaseModel):
@@ -40,14 +40,17 @@ class ProductInfo(BaseModel):
     )
 
 
-class ImageState(TypeDict):
-    img : Image.Image
-    prompt : str = "Fashion"
-    boxes : Optional[List[List[int]]] = Field(default_factory=list)
-    products : Optional[List[ProductInfo]] = Field(default_factory=list)
-    segmented_imgs : Optional[List[Image.Image]] = Field(default_factory=list)
-    nearest_items : Optional[dict] = None
-    errors : Optional[List[str]] = None
+
+class ImageState(BaseModel):
+    img: Optional[Image.Image] = None
+    prompt: str = "Fashion"
+
+    boxes: List[List[int]] = Field(default_factory=list)
+    products: List[ProductInfo] = Field(default_factory=list)
+    segmented_imgs: List[Image.Image] = Field(default_factory=list)
+
+    nearest_items: Optional[Dict] = None
+    errors: List[str] = Field(default_factory=list)
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True

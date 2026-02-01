@@ -2,6 +2,7 @@ from google import genai
 from dotenv import load_dotenv
 load_dotenv()
 
+GeminiClient = None
 print("Gemini model is loading......")
 try:
     GeminiClient = genai.Client()
