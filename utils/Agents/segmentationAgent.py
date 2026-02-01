@@ -42,55 +42,15 @@ class SegmentationAgent:
             errors.append("No objects detected in the image")
             return {**imageState.model_dump() , "errors" : errors}
 
-        imgWithMask = draw_boxes_on_image(f_Img, boxes)
         cropped_imgs = getCroppedImgs(f_Img, boxes)
         
 
         return {**imageState.model_dump(),
                 "boxes" : boxes,
                 "segmented_imgs" : cropped_imgs,
-                "img" : imgWithMask
                 }
         
 
-def draw_boxes_on_image(image, boxes):
-    """
-    Draws a rectangle on a given PIL image using the provided box coordinates in xywh format.
-    :param image: PIL.Image - The image on which to draw the rectangle.
-    :param box: tuple - A tuple (x, y, w, h) representing the top-left corner, width, and height of the rectangle.
-    :param color: tuple - A tuple (R, G, B) representing the color of the rectangle. Default is red.
-    :return: PIL.Image - The image with the rectangle drawn on it.
-    """
-    # Ensure the image is in RGB mode
-    try:
-        image = image.convert("RGB")
-    except Exception as e:
-        print("Img conversion failed")
-        return image
-    
-    color=(0, 255, 0)
-    width, height = image.size
-    # Unpack the box coordinates and draw a line on all of them
-    for box in boxes:
-        x1, y1, x2, y2 = box
-        x1, y1, x2, y2 = map(int, (x1, y1, x2, y2))
-        x1 = max(0, min(x1, width - 1))
-        y1 = max(0, min(y1, height - 1))
-        x2 = max(0, min(x2, width - 1))
-        y2 = max(0, min(y2, height - 1))
-
-        # Get the pixel data
-        pixels = image.load()
-        # Draw the top and bottom edges
-        for i in range(x1, x2 + 1):
-            pixels[i, y1] = color
-            pixels[i, y2] = color
-
-        for j in range(y1, y2 + 1):
-            pixels[x1, j] = color
-            pixels[x2, j] = color
-
-    return image
 
 def getCroppedImgs(image, boxes):
     try:

@@ -11,6 +11,7 @@ class StopWorkflowAgent:
 
         err = imageState.errors if imageState.errors is not None else []
         err.append("Workflow stopped by StopWorkflowAgent")
+        
         return {
             "errors": err
         }

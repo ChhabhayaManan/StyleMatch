@@ -6,6 +6,7 @@ from utils.Agents.stopWorkflow1 import StopWorkflowAgent
 from utils.Agents.segmentationAgent import SegmentationAgent
 from utils.Agents.infoRetrievalAgent import InfoRetrievalAgent
 from utils.Agents.productRecognizerAgent import ProductRecognizerAgent
+from utils.Agents.imageLabelingAgent import ImageLabelingAgent
 from PIL import Image
 def ImgProcessing(uploadedImg: Image.Image, Prompt: str = "Fashion"):
     
@@ -24,6 +25,8 @@ def ImgProcessing(uploadedImg: Image.Image, Prompt: str = "Fashion"):
     stopWorkflowAgent = StopWorkflowAgent()
     productRecognizerAgent = ProductRecognizerAgent()
     infoRetrievalAgent = InfoRetrievalAgent(index_path=index_path, metadata_path=json_path)
+    imgLabelAgent = ImageLabelingAgent()
+
 
     print("Building workflow graph...")
     graph.set_entry_point("Segmentation")
@@ -31,13 +34,14 @@ def ImgProcessing(uploadedImg: Image.Image, Prompt: str = "Fashion"):
     graph.add_node("InfoRetrieval", infoRetrievalAgent.run)
     graph.add_node("ProductRecognition", productRecognizerAgent.run)
     graph.add_node("StopWorkflow", stopWorkflowAgent.run)
-
+    graph.add_node("ImageLabeling", imgLabelAgent.run)
 
     print("Connecting workflow nodes...")
     graph.add_edge(START, "Segmentation")
     graph.add_edge("Segmentation", "InfoRetrieval")
     graph.add_edge("InfoRetrieval", "ProductRecognition")
-    graph.add_edge("ProductRecognition", "StopWorkflow")
+    graph.add_edge("ProductRecognition", "ImageLabeling")
+    graph.add_edge("ImageLabeling", "StopWorkflow")
     graph.add_edge("StopWorkflow", END)
 
     print("Compiling workflow graph...")
@@ -52,14 +56,10 @@ def ImgProcessing(uploadedImg: Image.Image, Prompt: str = "Fashion"):
     )
 
     result = compiled.invoke(initial_state)
+    resultImg = result['img']
+    resultImg.show()
 
-    print(result)
-    ImageState.img.show()
-    print(
-        f"Workflow completed. Retrieved {len(result['products'])} products."
-        f" Errors: {result['errors']}"
-    )
-
+    resultImg.save("/root/data/result.jpg", "JPEG")
 
 if __name__ == "__main__":
     test_img_path = os.path.join(os.getcwd(), "data/demo.webp")
