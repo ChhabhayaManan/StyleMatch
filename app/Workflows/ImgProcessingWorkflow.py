@@ -1,3 +1,5 @@
+import time
+start = time.perf_counter()
 from langgraph.graph import START, END, StateGraph
 import sys
 import os
@@ -6,18 +8,22 @@ from utils.Agents.stopWorkflow1 import StopWorkflowAgent
 from utils.Agents.segmentationAgent import SegmentationAgent
 from utils.Agents.infoRetrievalAgent import InfoRetrievalAgent
 from utils.Agents.productRecognizerAgent import ProductRecognizerAgent
-from utils.Agents.imageLabelingAgent import ImageLabelingAgent
+from utils.Agents.imageLabelingAgent import imageLabelingAgent
 from PIL import Image
+
+
+
+
 def ImgProcessing(uploadedImg: Image.Image, Prompt: str = "Fashion"):
     
     
     graph = StateGraph(ImageState)
     
-    BASE_DIR = "/root/data"
+
 
     
-    index_path = f"{BASE_DIR}/fashion_product_images.index"
-    json_path = f"{BASE_DIR}/fashion_product_info.json"
+    index_path = "/teamspace/studios/this_studio/StyleMatch/data/fashion_product_images.index"
+    json_path = "/teamspace/studios/this_studio/StyleMatch/data/fashion_product_info.json"
     print(index_path)
 
     print("Initializing agents...")
@@ -25,7 +31,7 @@ def ImgProcessing(uploadedImg: Image.Image, Prompt: str = "Fashion"):
     stopWorkflowAgent = StopWorkflowAgent()
     productRecognizerAgent = ProductRecognizerAgent()
     infoRetrievalAgent = InfoRetrievalAgent(index_path=index_path, metadata_path=json_path)
-    imgLabelAgent = ImageLabelingAgent()
+    imgLabelAgent = imageLabelingAgent()
 
 
     print("Building workflow graph...")
@@ -59,9 +65,13 @@ def ImgProcessing(uploadedImg: Image.Image, Prompt: str = "Fashion"):
     resultImg = result['img']
     resultImg.show()
 
-    resultImg.save("/root/data/result.jpg", "JPEG")
+    save_path = os.path.join(os.getcwd(), "data/result.jpg")
+    resultImg.save(save_path, "JPEG")
 
 if __name__ == "__main__":
-    test_img_path = os.path.join(os.getcwd(), "data/demo.webp")
+    
+    test_img_path = os.path.join(os.getcwd(), "data/77909915.webp")
     test_img = Image.open(test_img_path)
-    ImgProcessing(test_img)
+    ImgProcessing(test_img,"Skirt")
+    end = time.perf_counter()
+    print(f"Total processing time: {end - start:.4f} seconds")

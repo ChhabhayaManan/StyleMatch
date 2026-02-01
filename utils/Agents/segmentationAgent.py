@@ -44,6 +44,8 @@ class SegmentationAgent:
 
         cropped_imgs = getCroppedImgs(f_Img, boxes)
         
+        print("Number of objects detected:", len(cropped_imgs))
+        print("Number of boxes detected:", len(boxes))
 
         return {**imageState.model_dump(),
                 "boxes" : boxes,
