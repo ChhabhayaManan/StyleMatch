@@ -49,6 +49,7 @@ class ProductRecognizerAgent:
             except Exception as e:
                 err = ImageState.errors
                 err.append(f"Gemini API error for segment {idx+1}: {str(e)}")
+                print(f"[Gemini] error in segment {idx+1}: {str(e)}", flush=True)
                 return {
                     "errors": err,
                     "products": identified_products

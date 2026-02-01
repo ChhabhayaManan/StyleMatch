@@ -24,6 +24,7 @@ class InfoRetrievalAgent:
         dist_indices = [self.index.search(embedding[np.newaxis, :], top_k) for embedding in embeddings_segments]
 
         print("Info retrieval completed.")
+        print("number of segments:", len(segmented_imgs))
         results = {}
         for seg_idx, (distances, indices) in enumerate(dist_indices):
             seg_results = []
