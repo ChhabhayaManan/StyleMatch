@@ -1,10 +1,13 @@
+from html import parser
 from typing import List
 from PIL import Image
-from utils.Templates.schemas import ProductInfo
+from utils.Templates.schemas import ProductInfo, shoppingProductInfo
 from langchain_core.output_parsers import JsonOutputParser
 from google.genai import types
 from io import BytesIO
-def prompt_template(nearest_items: List, img: Image.Image) -> List:
+
+
+def prompt_template_Recognization(nearest_items: List, img: Image.Image) -> List:
     if img.mode != "RGB":
         img = img.convert("RGB")
 
@@ -32,3 +35,16 @@ If a field is unclear, return `none` and do not guess."""
         nearest_items_info
     ]
 
+
+def shoppingInfoPrompt(products: ProductInfo):
+    parser = JsonOutputParser(pydantic_object=shoppingProductInfo)
+    instructions = parser.get_format_instructions()
+    prompt = {
+        "SystemMessage" : """You are a helpful assistant that provides shopping information for fashion products. Given a product information, make a search query to find relevant shopping data including product price, URL, rating, reviews count, image link, seller name, and seller logo URL
+                      it is not necessary to make query with all the information just use product name and brand. use tools for getting data from web and seller logo URL. Provide at max 5 results of shopping data in JSON format.
+                      you have 2 tools available: 1. shoppingDatafromWeb 2. sellerLogoUrl use them sequencially to get the required information.""",
+        "HumanMessage" : f"""Product Information: {products}
+                      instuctions for output format for one: {instructions}
+                    you need to provide list of these objects"""
+    }
+    return prompt

@@ -24,7 +24,7 @@ class ProductRecognizerAgent:
         segmentated_imgs = ImageState.segmented_imgs
         nearest_items = ImageState.nearest_items
 
-        
+
 
         print("Performing product recognition...")
         for idx, img in enumerate(segmentated_imgs):
@@ -33,7 +33,7 @@ class ProductRecognizerAgent:
                 flush=True
             )
             nearest_items_segment = nearest_items.get(f'segment_{idx}', [])
-            prompt = prompt_template(
+            prompt = prompt_template_Recognization(
                 nearest_items=nearest_items_segment,
                 img=img
             )

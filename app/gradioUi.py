@@ -6,6 +6,97 @@ countries = [
     for country in pycountry.countries
 ]
 
+css_temp =""".product-card {
+  max-width: 320px;
+  width: 100%;
+  font-family: Inter, Arial, sans-serif;
+}
+
+.product-card a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.product-box {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-box:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+}
+
+/* Image */
+.product-image {
+  aspect-ratio: 1 / 1;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Content */
+.product-content {
+  padding: 14px;
+}
+
+.product-title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: 6px;
+}
+
+.product-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.product-stars {
+  color: #f5a623;
+}
+
+.product-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.product-seller {
+  height: 24px;
+  object-fit: contain;
+}
+
+.product-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111;
+}
+
+/* Responsive tweak */
+@media (max-width: 480px) {
+  .product-title {
+    font-size: 15px;
+  }
+  .product-price {
+    font-size: 16px;
+  }
+}
+"""
 
 def styleMatch():
     with gr.Blocks() as app:
@@ -43,7 +134,8 @@ def styleMatch():
                     value = 'en',
                     interactive=True
                 )
-        product_links_html = gr.HTML(label="Available On")
+        
+        product_links_html = gr.HTML(label="Available On", css_template=css_temp)
 
         product_list.click(
             fn = getProductListAgent,
