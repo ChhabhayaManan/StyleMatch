@@ -1,11 +1,11 @@
 import torch
 from huggingface_hub import login
 import os
-
-login(token=os.environ["HUGGINGFACEHUB_API_TOKEN"])
-
 from sam3.model_builder import build_sam3_image_model
 
+"""Module to load the SAM3 model for image segmentation."""
+
+login(token=os.environ["HUGGINGFACEHUB_API_TOKEN"])
 model = None
 
 print("Sam3 is loading......")

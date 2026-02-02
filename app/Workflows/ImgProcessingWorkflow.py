@@ -9,6 +9,8 @@ from utils.Agents.segmentationAgent import SegmentationAgent
 from utils.Agents.infoRetrievalAgent import InfoRetrievalAgent
 from utils.Agents.productRecognizerAgent import ProductRecognizerAgent
 from utils.Agents.imageLabelingAgent import imageLabelingAgent
+from utils.Agents.htmlblockGeneratorNode import htmlblockGeneratorNode
+from utils.Agents.shoppingInfoAgent import shoppingInfoAgent
 from PIL import Image
 
 
@@ -32,6 +34,8 @@ def ImgProcessing(uploadedImg: Image.Image, Prompt: str = "Fashion"):
     productRecognizerAgent = ProductRecognizerAgent()
     infoRetrievalAgent = InfoRetrievalAgent(index_path=index_path, metadata_path=json_path)
     imgLabelAgent = imageLabelingAgent()
+    shoppingInfoAgentNode = shoppingInfoAgent(limit=3, region='in')
+    htmlBlockGeneratorNode = htmlblockGeneratorNode()
 
 
     print("Building workflow graph...")
@@ -41,13 +45,17 @@ def ImgProcessing(uploadedImg: Image.Image, Prompt: str = "Fashion"):
     graph.add_node("ProductRecognition", productRecognizerAgent.run)
     graph.add_node("StopWorkflow", stopWorkflowAgent.run)
     graph.add_node("ImageLabeling", imgLabelAgent.run)
+    graph.add_node("ShoppingInfo", shoppingInfoAgentNode.run)
+    graph.add_node("HTMLBlockGenerator", htmlBlockGeneratorNode.run)
 
     print("Connecting workflow nodes...")
     graph.add_edge(START, "Segmentation")
     graph.add_edge("Segmentation", "InfoRetrieval")
     graph.add_edge("InfoRetrieval", "ProductRecognition")
     graph.add_edge("ProductRecognition", "ImageLabeling")
-    graph.add_edge("ImageLabeling", "StopWorkflow")
+    graph.add_edge("ImageLabeling", "ShoppingInfo")
+    graph.add_edge("ShoppingInfo", "HTMLBlockGenerator")
+    graph.add_edge("HTMLBlockGenerator", "StopWorkflow")
     graph.add_edge("StopWorkflow", END)
 
     print("Compiling workflow graph...")
