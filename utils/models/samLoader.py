@@ -1,5 +1,7 @@
 import torch
 from huggingface_hub import login
+from dotenv import load_dotenv
+load_dotenv()
 import os
 from sam3.model_builder import build_sam3_image_model
 

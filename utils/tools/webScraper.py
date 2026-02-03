@@ -18,6 +18,8 @@ def shoppingDatafromWeb(query: str, limit: int = 10, region: str = 'in'):
     }
     query += " Best Sellers"
     encoded_query = quote(query)
+
+
     url = f"/search-v2?q={encoded_query}&country={region}&language=en&page=1&limit={limit}&sort_by=BEST_MATCH&product_condition=ANY&return_filters=true"
     conn.request("GET", url, headers=headers)
     res = conn.getresponse()

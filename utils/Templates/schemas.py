@@ -95,7 +95,7 @@ class ImageState(BaseModel):
 
     nearest_items: Optional[Dict] = None
     errors: Optional[List[str]] = Field(default_factory=list)
-    html_shopping: Optional[List[str]] = Field(default_factory=list)
+    html_shopping: Optional[str] = Field(default_factory=str)
     productShoppingInfos: Optional[ShoppingProductList] = Field(default_factory=ShoppingProductList)
 
     model_config = ConfigDict(
