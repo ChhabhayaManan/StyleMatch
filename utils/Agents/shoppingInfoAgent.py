@@ -13,8 +13,10 @@ class shoppingInfoAgent:
     def run(self, image_state: ImageState):
         all_product_infos = image_state.products
         all_products_shopping_lists = []
+        print("Fetching shopping information...")
 
-        for product in all_product_infos:
+        for ind, product in enumerate(all_product_infos):
+            print(f"Searching for shopping info for product: {ind} / {len(all_product_infos)}")
             search_query = product.productDisplayName + " " + product.Brand if product.Brand else " " + product.Color
             shopping_data = shoppingDatafromWeb(search_query, self.limit, self.region)
             for item in shopping_data.items:
@@ -22,6 +24,7 @@ class shoppingInfoAgent:
                     item.seller_logo_url = sellerLogoUrl(item.product_url)
                 all_products_shopping_lists.append(item)
 
+        print("Shopping information fetching completed.")
         shoppingList = ShoppingProductList(items=all_products_shopping_lists)
 
         return {

@@ -10,7 +10,7 @@ import json
 from utils.models.geminiModel import GeminiClient
 from utils.models.clipModel import clip_model
 from utils.Templates.schemas import ProductInfo, ImageState
-from utils.Templates.promptTemplate import prompt_template
+from utils.Templates.promptTemplate import prompt_template_Recognization
 from PIL import Image
 
 

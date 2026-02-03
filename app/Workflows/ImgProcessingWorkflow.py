@@ -12,12 +12,15 @@ from utils.Agents.imageLabelingAgent import imageLabelingAgent
 from utils.Agents.htmlblockGeneratorNode import htmlblockGeneratorNode
 from utils.Agents.shoppingInfoAgent import shoppingInfoAgent
 from PIL import Image
+import numpy as np
 
 
 
 
-def ImgProcessing(uploadedImg: Image.Image, Prompt: str = "Fashion"):
+def ImgProcessing(uploadedImg: Image.Image or np.ndarray, Prompt: str = "Fashion"):
     
+    if isinstance(uploadedImg, np.ndarray):
+        uploadedImg = Image.fromarray(uploadedImg)
     
     graph = StateGraph(ImageState)
     
@@ -34,7 +37,7 @@ def ImgProcessing(uploadedImg: Image.Image, Prompt: str = "Fashion"):
     productRecognizerAgent = ProductRecognizerAgent()
     infoRetrievalAgent = InfoRetrievalAgent(index_path=index_path, metadata_path=json_path)
     imgLabelAgent = imageLabelingAgent()
-    shoppingInfoAgentNode = shoppingInfoAgent(limit=3, region='in')
+    shoppingInfoAgentNode = shoppingInfoAgent(limit=5, region='in')
     htmlBlockGeneratorNode = htmlblockGeneratorNode()
 
 
@@ -72,9 +75,12 @@ def ImgProcessing(uploadedImg: Image.Image, Prompt: str = "Fashion"):
     result = compiled.invoke(initial_state)
     resultImg = result['img']
     resultImg.show()
-
+    resultHTMLS = result['html_shopping']
+    print("Generated HTML Blocks: ", resultHTMLS)
     save_path = os.path.join(os.getcwd(), "data/result.jpg")
     resultImg.save(save_path, "JPEG")
+
+    return resultHTMLS, resultImg
 
 if __name__ == "__main__":
     
