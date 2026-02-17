@@ -1,0 +1,70 @@
+# StyleMatch dependencies
+# Generated from testModal.py image.pip_install() + repo runtime imports.
+
+# --- Core app ---
+gradio
+pycountry
+langgraph
+pydantic
+pillow
+numpy<2
+matplotlib
+python-dotenv
+requests
+faiss-cpu
+sentence-transformers
+torch==2.7.0
+torchvision
+torchaudio
+langchain
+langchain-core
+langchain-google-genai
+google-generativeai
+google-genai
+transformers
+opencv-python
+pycocotools
+
+# --- SAM3 / vision pipeline deps (from testModal.py) ---
+timm>=1.0.17
+tqdm
+ftfy==6.1.1
+regex
+iopath>=0.1.10
+huggingface_hub
+scikit-image
+scikit-learn
+decord
+einops
+scipy
+numba
+fvcore
+fairscale
+torchmetrics
+hydra-core
+submitit
+tensorboard
+zstandard
+python-rapidjson
+psutil
+
+# --- Notebook / utility deps used in modal image ---
+pandas
+jupyter
+notebook
+ipywidgets
+ipycanvas
+ipympl
+yt-dlp
+gitpython==3.1.31
+
+# --- Formatting / test tools included in testModal.py ---
+pytest
+pytest-cov
+black==24.2.0
+ufmt==2.8.0
+ruff-api==0.1.0
+usort==1.0.2
+
+# --- Modal execution ---
+modal
