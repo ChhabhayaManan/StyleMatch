@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1050" viewBox="0 0 1800 1050">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,3 L0,6 z" fill="#34495e" />
+    </marker>
+    <style>
+      .title { font: 700 34px Arial, sans-serif; fill: #1f2937; }
+      .node { stroke: #2c3e50; stroke-width: 3; rx: 14; ry: 14; }
+      .txt { font: 600 24px Arial, sans-serif; fill: #111827; }
+      .small { font: 18px Arial, sans-serif; fill: #374151; }
+      .edge { stroke: #34495e; stroke-width: 4; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <text x="620" y="45" class="title">StyleMatch Workflow (Redraw from Hand Sketch)</text>
+
+  <!-- Main flow -->
+  <rect class="node" x="50" y="90" width="150" height="70" fill="#eef2ff"/>
+  <text class="txt" x="93" y="132">Start</text>
+
+  <rect class="node" x="260" y="85" width="320" height="85" fill="#e8f5e9"/>
+  <text class="txt" x="325" y="125">Segmentation Agent</text>
+
+  <rect class="node" x="670" y="85" width="320" height="85" fill="#e8f5e9"/>
+  <text class="txt" x="733" y="125">InfoRetrievalAgent</text>
+
+  <rect class="node" x="1110" y="255" width="360" height="95" fill="#e8f5e9"/>
+  <text class="txt" x="1170" y="310">ProductRecognition</text>
+
+  <rect class="node" x="760" y="255" width="270" height="85" fill="#e8f5e9"/>
+  <text class="txt" x="812" y="306">LabellingAgent</text>
+
+  <rect class="node" x="450" y="440" width="260" height="85" fill="#fff3e0"/>
+  <text class="txt" x="510" y="492">ShoppingInfo</text>
+
+  <rect class="node" x="460" y="640" width="260" height="85" fill="#ede7f6"/>
+  <text class="txt" x="535" y="693">HTML Block</text>
+
+  <rect class="node" x="820" y="640" width="280" height="85" fill="#ffebee"/>
+  <text class="txt" x="887" y="693">StopWorkflow</text>
+
+  <rect class="node" x="1160" y="640" width="140" height="85" fill="#ffebee"/>
+  <text class="txt" x="1200" y="693">Stop</text>
+
+  <!-- arrows -->
+  <path class="edge" d="M200 125 L260 125"/>
+  <text class="small" x="208" y="95">img, prompt</text>
+
+  <path class="edge" d="M580 125 L670 125"/>
+  <text class="small" x="595" y="95">boxes, seg_imgs</text>
+
+  <path class="edge" d="M990 127 L1288 255"/>
+  <text class="small" x="1010" y="112">nearest_items</text>
+
+  <path class="edge" d="M1110 298 L1030 298"/>
+  <text class="small" x="1042" y="270">product</text>
+
+  <path class="edge" d="M760 300 L580 440"/>
+  <text class="small" x="612" y="380">img (labelled), limit, region</text>
+
+  <path class="edge" d="M580 525 L580 640"/>
+  <text class="small" x="600" y="586">shopping info</text>
+
+  <path class="edge" d="M720 683 L820 683"/>
+  <text class="small" x="730" y="653">HTML blocks</text>
+
+  <path class="edge" d="M1100 683 L1160 683"/>
+
+  <!-- Dependencies -->
+  <rect class="node" x="250" y="200" width="130" height="58" fill="#f1f8e9"/>
+  <text class="txt" x="290" y="236">SAM3</text>
+  <path class="edge" d="M420 170 L315 200"/>
+
+  <rect class="node" x="700" y="200" width="115" height="58" fill="#f1f8e9"/>
+  <text class="txt" x="734" y="236">CLIP</text>
+
+  <rect class="node" x="855" y="200" width="115" height="58" fill="#e3f2fd"/>
+  <text class="txt" x="890" y="236">FAISS</text>
+
+  <rect class="node" x="1000" y="200" width="140" height="58" fill="#e3f2fd"/>
+  <text class="small" x="1040" y="226">JSON</text>
+  <text class="small" x="1034" y="246">index</text>
+
+  <path class="edge" d="M820 170 L757 200"/>
+  <path class="edge" d="M860 170 L912 200"/>
+  <path class="edge" d="M1000 229 L970 229"/>
+
+  <rect class="node" x="1110" y="370" width="120" height="58" fill="#f1f8e9"/>
+  <text class="txt" x="1145" y="406">MLLM</text>
+
+  <rect class="node" x="1260" y="370" width="140" height="58" fill="#fffde7"/>
+  <text class="small" x="1290" y="398">Prompt</text>
+  <text class="small" x="1286" y="418">Template</text>
+
+  <rect class="node" x="1430" y="370" width="160" height="58" fill="#fffde7"/>
+  <text class="small" x="1470" y="398">ProductInfo</text>
+  <text class="small" x="1450" y="418">(schema)</text>
+
+  <path class="edge" d="M1290 350 L1170 370"/>
+  <path class="edge" d="M1290 350 L1330 370"/>
+  <path class="edge" d="M1430 399 L1350 350"/>
+
+  <rect class="node" x="235" y="545" width="150" height="58" fill="#fffde7"/>
+  <text class="small" x="270" y="580">WebScraper</text>
+
+  <rect class="node" x="235" y="615" width="170" height="58" fill="#fffde7"/>
+  <text class="small" x="270" y="650">sellerLogoUrl</text>
+
+  <rect class="node" x="235" y="685" width="180" height="58" fill="#fffde7"/>
+  <text class="small" x="260" y="715">ShoppingInfo</text>
+  <text class="small" x="274" y="735">(schema)</text>
+
+  <path class="edge" d="M450 482 L385 574"/>
+  <path class="edge" d="M450 482 L405 644"/>
+  <path class="edge" d="M450 482 L415 714"/>
+
+  <!-- State box -->
+  <rect x="50" y="290" width="330" height="260" rx="12" ry="12" fill="#fafafa" stroke="#9ca3af" stroke-width="2"/>
+  <text class="txt" x="70" y="324">ImageState</text>
+  <text class="small" x="70" y="355">- img</text>
+  <text class="small" x="70" y="380">- prompt</text>
+  <text class="small" x="70" y="405">- segmented_imgs, boxes</text>
+  <text class="small" x="70" y="430">- products</text>
+  <text class="small" x="70" y="455">- nearest_items</text>
+  <text class="small" x="70" y="480">- errors</text>
+  <text class="small" x="70" y="505">- html_shopping</text>
+  <text class="small" x="70" y="530">- productShoppingInfos</text>
+</svg>
