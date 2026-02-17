@@ -42,12 +42,9 @@ StyleMatch/
 
 ## Workflow diagram
 
-Below is a clean redraw of the workflow from your hand-drawn sketch:
 
-![StyleMatch workflow redraw](docs/Flow.jpg)
+![StyleMatch workflow](docs/Flow.jpg)
 
-This diagram maps to the implemented LangGraph node order:
-`Segmentation -> InfoRetrieval -> ProductRecognition -> ImageLabeling -> ShoppingInfo -> HTMLBlockGenerator -> StopWorkflow`.
 
 ---
 
