@@ -20,7 +20,22 @@ class SegmentationAgent:
 
         if f_Img.mode != "RGB": #if the dimentions of img are more than 3 convert to RGB
             f_Img = f_Img.convert("RGB")
+
+
+        if model is None:
+            error = "Segmentation model SAM3 not loaded."
+            errors = imageState.errors
+            errors.append(error)
+            return{
+                "boxes" : [],
+                "errors" : errors,
+                "segmented_imgs" : [f_Img]
+            }
+
+        
         print("Performing segmentation...")
+
+
         Processor = Sam3Processor(model, confidence_threshold=0.7)
 
         #inference states for processing the img
@@ -40,7 +55,11 @@ class SegmentationAgent:
         if len(boxes) == 0:
             errors = imageState.errors
             errors.append("No objects detected in the image")
-            return {**imageState.model_dump() , "errors" : errors}
+            return {
+                "boxes" : [],
+                "errors" : errors,
+                "segmented_imgs" : [f_Img]
+            }
 
         cropped_imgs = getCroppedImgs(f_Img, boxes)
         

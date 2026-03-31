@@ -60,6 +60,11 @@ image = (
         "torchmetrics",
         "fvcore",
         "fairscale",
+        "time", 
+        "html", 
+        "requests",
+        "urllib3",
+        
 
         # your existing stack
         "transformers",

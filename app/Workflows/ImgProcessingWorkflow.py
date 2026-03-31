@@ -17,7 +17,7 @@ import numpy as np
 
 
 
-def ImgProcessing(uploadedImg: Image.Image or np.ndarray, Prompt: str = "Fashion"):
+def ImgProcessing(uploadedImg: Image.Image or np.ndarray, Prompt: str = "Fashion", Limit: int = 5, Region: str = 'in'):
     
     if isinstance(uploadedImg, np.ndarray):
         uploadedImg = Image.fromarray(uploadedImg)
@@ -26,24 +26,30 @@ def ImgProcessing(uploadedImg: Image.Image or np.ndarray, Prompt: str = "Fashion
     
 
 
-    
     index_path = "/teamspace/studios/this_studio/StyleMatch/data/fashion_product_images.index"
     json_path = "/teamspace/studios/this_studio/StyleMatch/data/fashion_product_info.json"
     print(index_path)
 
     print("Initializing agents...")
+
+ 
     segmentationAgent = SegmentationAgent()
-    stopWorkflowAgent = StopWorkflowAgent()
-    productRecognizerAgent = ProductRecognizerAgent()
     infoRetrievalAgent = InfoRetrievalAgent(index_path=index_path, metadata_path=json_path)
+    productRecognizerAgent = ProductRecognizerAgent()
     imgLabelAgent = imageLabelingAgent()
-    shoppingInfoAgentNode = shoppingInfoAgent(limit=5, region='in')
+    shoppingInfoAgentNode = shoppingInfoAgent(limit=Limit, region=Region)
     htmlBlockGeneratorNode = htmlblockGeneratorNode()
+    stopWorkflowAgent = StopWorkflowAgent()
 
-
+    a = os.path.exists(index_path) and os.path.exists(json_path)
+    isSegmentationAgentInitialized = segmentationAgent is not None
     print("Building workflow graph...")
     graph.set_entry_point("Segmentation")
-    graph.add_node("Segmentation", segmentationAgent.run)
+
+    if isSegmentationAgentInitialized:
+        graph.add_node("Segmentation", segmentationAgent.run)
+
+
     graph.add_node("InfoRetrieval", infoRetrievalAgent.run)
     graph.add_node("ProductRecognition", productRecognizerAgent.run)
     graph.add_node("StopWorkflow", stopWorkflowAgent.run)
@@ -52,8 +58,14 @@ def ImgProcessing(uploadedImg: Image.Image or np.ndarray, Prompt: str = "Fashion
     graph.add_node("HTMLBlockGenerator", htmlBlockGeneratorNode.run)
 
     print("Connecting workflow nodes...")
-    graph.add_edge(START, "Segmentation")
-    graph.add_edge("Segmentation", "InfoRetrieval")
+
+    if isSegmentationAgentInitialized:
+        graph.add_edge(START, "Segmentation")
+        graph.add_edge("Segmentation", "InfoRetrieval")
+    else:
+        print("Segmentation Agent not initialized. Skipping segmentation step.")     
+        graph.add_edge(START, "InfoRetrieval")
+
     graph.add_edge("InfoRetrieval", "ProductRecognition")
     graph.add_edge("ProductRecognition", "ImageLabeling")
     graph.add_edge("ImageLabeling", "ShoppingInfo")
@@ -79,8 +91,10 @@ def ImgProcessing(uploadedImg: Image.Image or np.ndarray, Prompt: str = "Fashion
     print("Generated HTML Blocks: ", resultHTMLS)
     save_path = os.path.join(os.getcwd(), "data/result.jpg")
     resultImg.save(save_path, "JPEG")
+    resultproducts = result['products']
+    resulterrors = result['errors']
 
-    return resultHTMLS, resultImg
+    return resultHTMLS, resultImg, resultproducts, resulterrors
 
 if __name__ == "__main__":
     

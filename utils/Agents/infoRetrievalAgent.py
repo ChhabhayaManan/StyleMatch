@@ -12,9 +12,18 @@ class InfoRetrievalAgent:
         with open(metadata_path, 'r') as f:
             self.metadata = json.load(f)
 
-    def run(self, imageState: ImageState, top_k: int = 2) -> dict:
+    def run(self, imageState: ImageState, top_k: int = 2, img: Image.Image or np.ndarray = None, prompt: str = None) -> dict:
         segmented_imgs = imageState.segmented_imgs
 
+        if len(segmented_imgs) == 0 and img is not None and prompt is not None:
+            segmented_imgs = [img]
+        elif len(segmented_imgs) == 0 and img is None:
+            error = imageState.errors
+            error.append("No segmented images available for info retrieval.")
+            return {
+                "errors" : error
+            }
+        
         print("Performing embedding generation...")
         embeddings_segments = [clip_model.encode(img) for img in segmented_imgs]
         embeddings_segments = np.array(embeddings_segments).astype('float32')
