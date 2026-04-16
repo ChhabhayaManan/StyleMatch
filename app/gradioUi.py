@@ -1,6 +1,8 @@
+import html
+
 import gradio as gr
 
-from app.Workflows.ImgProcessingWorkflow import ImgProcessing
+from app.Workflows.ImgProcessingWorkflow import WORKFLOW_ACTIVITY_STEPS, stream_img_processing
 
 APP_CSS = """
 body {
@@ -135,6 +137,214 @@ body {
     text-transform: uppercase;
 }
 
+.activity-shell {
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 248, 250, 0.92));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    padding: 20px;
+}
+
+.activity-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.activity-kicker {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.activity-title {
+    margin: 6px 0 4px;
+    color: #111827;
+    font-size: 1.08rem;
+    font-weight: 700;
+}
+
+.activity-summary {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.94rem;
+    line-height: 1.6;
+}
+
+.activity-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.activity-badge::before {
+    content: "";
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: currentColor;
+}
+
+.activity-badge--ready {
+    background: rgba(226, 232, 240, 0.7);
+    color: #64748b;
+}
+
+.activity-badge--live {
+    background: rgba(254, 242, 242, 0.95);
+    color: #f43f5e;
+}
+
+.activity-badge--done {
+    background: rgba(236, 253, 245, 0.95);
+    color: #15803d;
+}
+
+.activity-badge--error {
+    background: rgba(255, 241, 242, 0.95);
+    color: #be123c;
+}
+
+.activity-progress-track {
+    height: 10px;
+    margin-top: 18px;
+    border-radius: 999px;
+    background: rgba(226, 232, 240, 0.8);
+    overflow: hidden;
+}
+
+.activity-progress-fill {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(135deg, #22c55e 0%, #f97316 56%, #ec4899 100%);
+    transition: width 0.3s ease;
+}
+
+.activity-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+    color: #6b7280;
+    font-size: 0.88rem;
+}
+
+.activity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px;
+    margin-top: 18px;
+}
+
+.activity-card {
+    min-height: 164px;
+    border-radius: 20px;
+    border: 1px solid rgba(226, 232, 240, 0.92);
+    background: rgba(255, 255, 255, 0.9);
+    padding: 16px;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.activity-card--done {
+    border-color: rgba(134, 239, 172, 0.9);
+    background: linear-gradient(180deg, rgba(240, 253, 244, 0.96), rgba(236, 253, 245, 0.92));
+}
+
+.activity-card--active {
+    border-color: rgba(251, 146, 60, 0.5);
+    background: linear-gradient(180deg, rgba(255, 247, 237, 0.98), rgba(253, 242, 248, 0.96));
+    box-shadow: 0 18px 32px rgba(249, 115, 22, 0.14);
+    transform: translateY(-2px);
+}
+
+.activity-card--error {
+    border-color: rgba(251, 113, 133, 0.7);
+    background: linear-gradient(180deg, rgba(255, 241, 242, 0.98), rgba(255, 247, 237, 0.94));
+}
+
+.activity-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.activity-card-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.activity-card-status::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: currentColor;
+}
+
+.activity-card-index {
+    color: #cbd5e1;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.activity-card-title {
+    margin-top: 22px;
+    color: #111827;
+    font-size: 1.04rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.activity-card-copy {
+    margin-top: 8px;
+    color: #64748b;
+    font-size: 0.92rem;
+    line-height: 1.55;
+}
+
+.activity-card-note {
+    margin-top: 16px;
+    color: #475569;
+    font-size: 0.84rem;
+    font-weight: 600;
+}
+
+.activity-card--pending .activity-card-status {
+    color: #cbd5e1;
+}
+
+.activity-card--done .activity-card-status {
+    color: #22c55e;
+}
+
+.activity-card--active .activity-card-status {
+    color: #f97316;
+}
+
+.activity-card--error .activity-card-status {
+    color: #f43f5e;
+}
+
 @media (max-width: 900px) {
     #app-shell {
         padding: 18px 12px 36px;
@@ -147,6 +357,10 @@ body {
     .panel {
         padding: 18px;
     }
+
+    .activity-header {
+        flex-direction: column;
+    }
 }
 """
 
@@ -155,8 +369,8 @@ HERO_HTML = """
     <div class="hero-kicker">Fashion Discovery Studio</div>
     <h1 class="hero-title">StyleMatch</h1>
     <p class="hero-copy">
-        Upload a look, name the piece you want to match, and get a labeled result with
-        shopping-ready recommendations in one place.
+        Upload a look, name the piece you want to match, and follow each agent live while
+        StyleMatch builds the labeled image and shopping-ready recommendations.
     </p>
 </div>
 """
@@ -170,6 +384,8 @@ EMPTY_RESULTS_HTML = """
 """
 
 EMPTY_PRODUCTS_TEXT = "Detected items will appear here after StyleMatch finishes processing your image."
+
+_ACTIVITY_STEP_MAP = {step["id"]: step for step in WORKFLOW_ACTIVITY_STEPS}
 
 
 def _format_products(products) -> str:
@@ -204,53 +420,202 @@ def _format_errors(errors) -> str:
         return ""
 
     if isinstance(errors, str):
-        cleaned_errors = [errors.strip()] if errors.strip() else []
+        raw_errors = [errors]
     else:
-        cleaned_errors = [str(error).strip() for error in errors if str(error).strip()]
+        raw_errors = list(errors)
+
+    cleaned_errors = []
+    for error in raw_errors:
+        text = str(error).strip()
+        if text and text not in cleaned_errors:
+            cleaned_errors.append(text)
 
     return "\n".join(cleaned_errors)
 
 
+def _render_activity_panel(active_node=None, completed_nodes=None, failed_node=None, message=None) -> str:
+    completed_nodes = completed_nodes or []
+    completed_set = set(completed_nodes)
+    total_steps = len(WORKFLOW_ACTIVITY_STEPS)
+    completed_count = len([step for step in WORKFLOW_ACTIVITY_STEPS if step["id"] in completed_set])
+    remaining_count = max(total_steps - completed_count, 0)
+
+    if failed_node:
+        badge_label = "Issue"
+        badge_class = "activity-badge activity-badge--error"
+        summary_text = message or "The workflow stopped before all agents could finish."
+        progress_ratio = completed_count / total_steps if total_steps else 0
+    elif active_node:
+        badge_label = "Live"
+        badge_class = "activity-badge activity-badge--live"
+        active_title = _ACTIVITY_STEP_MAP.get(active_node, {}).get("title", active_node)
+        summary_text = f"{completed_count} of {total_steps} agents complete. Running {active_title} now."
+        progress_ratio = min((completed_count + 0.45) / total_steps, 1) if total_steps else 0
+    elif completed_count == total_steps and total_steps:
+        badge_label = "Done"
+        badge_class = "activity-badge activity-badge--done"
+        summary_text = f"All {total_steps} agents finished. Your annotated image and matches are ready."
+        progress_ratio = 1
+    else:
+        badge_label = "Ready"
+        badge_class = "activity-badge activity-badge--ready"
+        summary_text = message or "Upload an image and start StyleMatch to watch each agent step through the workflow."
+        progress_ratio = 0
+
+    pending_ids = [
+        step["id"]
+        for step in WORKFLOW_ACTIVITY_STEPS
+        if step["id"] not in completed_set and step["id"] != active_node and step["id"] != failed_node
+    ]
+    next_pending = pending_ids[0] if pending_ids else None
+    progress_percent = round(progress_ratio * 100, 1)
+
+    card_html = []
+    for index, step in enumerate(WORKFLOW_ACTIVITY_STEPS, start=1):
+        step_id = step["id"]
+        if step_id == failed_node:
+            status_class = "activity-card activity-card--error"
+            status_text = "Error"
+            note_text = "Needs attention"
+        elif step_id in completed_set:
+            status_class = "activity-card activity-card--done"
+            status_text = "Done"
+            note_text = "Completed"
+        elif step_id == active_node:
+            status_class = "activity-card activity-card--active"
+            status_text = "Live"
+            note_text = "Running now"
+        else:
+            status_class = "activity-card activity-card--pending"
+            status_text = "Queued"
+            note_text = "Up next" if step_id == next_pending else "Waiting"
+
+        card_html.append(
+            f"""
+            <div class="{status_class}">
+                <div class="activity-card-top">
+                    <span class="activity-card-status">{html.escape(status_text)}</span>
+                    <span class="activity-card-index">{index:02d}</span>
+                </div>
+                <div class="activity-card-title">{html.escape(step['title'])}</div>
+                <div class="activity-card-copy">{html.escape(step['description'])}</div>
+                <div class="activity-card-note">{html.escape(note_text)}</div>
+            </div>
+            """
+        )
+
+    return f"""
+    <div class="activity-shell">
+        <div class="activity-header">
+            <div>
+                <p class="activity-kicker">Agent Activity</p>
+                <p class="activity-title">Workflow status</p>
+                <p class="activity-summary">{html.escape(summary_text)}</p>
+            </div>
+            <div class="{badge_class}">{html.escape(badge_label)}</div>
+        </div>
+        <div class="activity-progress-track">
+            <div class="activity-progress-fill" style="width: {progress_percent}%;"></div>
+        </div>
+        <div class="activity-meta">
+            <span>{completed_count} complete</span>
+            <span>{remaining_count} to go</span>
+        </div>
+        <div class="activity-grid">
+            {''.join(card_html)}
+        </div>
+    </div>
+    """
+
+
+EMPTY_ACTIVITY_HTML = _render_activity_panel()
+
+
+def _build_ui_update(workflow_update, error_text="", failed_node=None):
+    completed_nodes = workflow_update.get("completed_nodes", [])
+    completed_set = set(completed_nodes)
+    state = workflow_update.get("state", {})
+    activity_html = _render_activity_panel(
+        active_node=workflow_update.get("active_node"),
+        completed_nodes=completed_nodes,
+        failed_node=failed_node,
+        message=error_text or None,
+    )
+
+    classified_image = state.get("img") if "ImageLabeling" in completed_set else None
+    products_value = (
+        _format_products(state.get("products"))
+        if "ProductRecognition" in completed_set
+        else EMPTY_PRODUCTS_TEXT
+    )
+    results_html = (
+        state.get("html_shopping") or EMPTY_RESULTS_HTML
+        if "HTMLBlockGenerator" in completed_set
+        else EMPTY_RESULTS_HTML
+    )
+
+    return (
+        activity_html,
+        results_html,
+        classified_image,
+        products_value,
+        gr.update(value=error_text, visible=bool(error_text)),
+    )
+
+
 def _reset_ui():
-    return None, "", None, EMPTY_RESULTS_HTML, EMPTY_PRODUCTS_TEXT, gr.update(value="", visible=False)
+    return (
+        None,
+        "",
+        EMPTY_ACTIVITY_HTML,
+        None,
+        EMPTY_RESULTS_HTML,
+        EMPTY_PRODUCTS_TEXT,
+        gr.update(value="", visible=False),
+    )
 
 
 def _run_stylematch(input_image, input_prompt):
     if input_image is None:
-        return (
+        error_text = "Upload an image before submitting."
+        yield (
+            EMPTY_ACTIVITY_HTML,
             EMPTY_RESULTS_HTML,
             None,
             EMPTY_PRODUCTS_TEXT,
-            gr.update(value="Upload an image before submitting.", visible=True),
+            gr.update(value=error_text, visible=True),
         )
+        return
 
     prompt = input_prompt.strip() if input_prompt and input_prompt.strip() else "Fashion"
+    latest_update = {"active_node": None, "completed_nodes": [], "state": {}}
 
     try:
-        product_links_html, classified_image, products, errors = ImgProcessing(input_image, prompt)
+        for workflow_update in stream_img_processing(input_image, prompt):
+            latest_update = workflow_update
+            error_text = _format_errors(workflow_update.get("state", {}).get("errors"))
+            yield _build_ui_update(workflow_update, error_text=error_text)
     except Exception as exc:
-        return (
-            EMPTY_RESULTS_HTML,
-            None,
-            EMPTY_PRODUCTS_TEXT,
-            gr.update(value=f"StyleMatch could not process this request.\n{exc}", visible=True),
+        error_text = f"StyleMatch could not process this request.\n{exc}"
+        failed_node = latest_update.get("active_node") or WORKFLOW_ACTIVITY_STEPS[0]["id"]
+        yield _build_ui_update(
+            latest_update,
+            error_text=error_text,
+            failed_node=failed_node,
         )
-
-    error_text = _format_errors(errors)
-    rendered_html = product_links_html or EMPTY_RESULTS_HTML
-
-    return (
-        rendered_html,
-        classified_image,
-        _format_products(products),
-        gr.update(value=error_text, visible=bool(error_text)),
-    )
 
 
 def styleMatch():
     with gr.Blocks(theme=gr.themes.Soft(), css=APP_CSS, title="StyleMatch") as app:
         with gr.Column(elem_id="app-shell"):
             gr.Markdown(HERO_HTML)
+
+            with gr.Column(elem_classes="panel"):
+                gr.Markdown("<p class='section-title'>Agent Activity</p>")
+                gr.Markdown(
+                    "<p class='section-copy'>Track which agent is currently running and how many are still left in the queue.</p>"
+                )
+                activity_board = gr.HTML(value=EMPTY_ACTIVITY_HTML)
 
             with gr.Row(equal_height=True):
                 with gr.Column(scale=5, elem_classes="panel"):
@@ -276,7 +641,7 @@ def styleMatch():
                 with gr.Column(scale=5, elem_classes="panel"):
                     gr.Markdown("<p class='section-title'>Results</p>")
                     gr.Markdown(
-                        "<p class='section-copy'>Review the labeled output image, detected product details, and any workflow feedback.</p>"
+                        "<p class='section-copy'>The labeled image and detected product details will populate here as the workflow finishes later agents.</p>"
                     )
                     classified_image = gr.Image(
                         label="Annotated image",
@@ -302,21 +667,30 @@ def styleMatch():
                 with gr.Column(elem_classes="panel"):
                     gr.Markdown("<p class='section-title'>Recommended Products</p>")
                     gr.Markdown(
-                        "<p class='section-copy'>Curated shopping cards will show up here after processing.</p>"
+                        "<p class='section-copy'>Curated shopping cards appear here once the workflow reaches the final gallery step.</p>"
                     )
                     product_links_html = gr.HTML(value=EMPTY_RESULTS_HTML)
 
             classify_button.click(
                 fn=_run_stylematch,
                 inputs=[input_image, input_prompt],
-                outputs=[product_links_html, classified_image, products_box, errors],
+                outputs=[activity_board, product_links_html, classified_image, products_box, errors],
             )
 
             reset_button.click(
                 fn=_reset_ui,
-                outputs=[input_image, input_prompt, classified_image, product_links_html, products_box, errors],
+                outputs=[
+                    input_image,
+                    input_prompt,
+                    activity_board,
+                    classified_image,
+                    product_links_html,
+                    products_box,
+                    errors,
+                ],
             )
 
+        app.queue()
         return app
 
 
